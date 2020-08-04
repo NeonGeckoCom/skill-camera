@@ -1,0 +1,8 @@
+(neon |)record (my user |){duration} video
+(neon |)video (my user |){duration}
+(neon |)take (my user |){duration} recording
+(neon |)take (my user |){duration} video
+(neon |)record for {duration}
+(neon |)video record for {duration}
+(neon |)take a video
+
