@@ -139,7 +139,7 @@ class UsbCamSkill(MycroftSkill):
         try:
             latest_pic = self.newest_file_in_dir(self.pic_path, self.image_extension) if not user \
                 else self.user_info_available["user"]["picture"]
-            if os.path.isfile(latest_pic):
+            if latest_pic and os.path.isfile(latest_pic):
                 self.speak_dialog("ShowLatest", private=True)
                 self.display_image(latest_pic, secs=secs, notify=notify)
             else:
