@@ -65,10 +65,13 @@ class UsbCamSkill(MycroftSkill):
             self.ensure_dir(self.pic_path)
             self.ensure_dir(self.vid_path)
             try:
-                # TODO: We have a yml param for this, keep fallback though
-                # camera_id = int(ngiConf("ngi_local_conf").content["devVars"].get("camDev", 0))
-                if len(glob.glob("/dev/video*")) > 0:
-                    self.cam_dev = sorted(glob.glob("/dev/video*"))[0]
+                camera_id = int(self.configuration_available["devVars"].get("camDev", 0))
+                cam_devs = glob.glob("/dev/video*")
+                if len(cam_devs) > 0:
+                    if f"/dev/video{camera_id}" in cam_devs:
+                        self.cam_dev = camera_id
+                    else:
+                        self.cam_dev = sorted(glob.glob("/dev/video*"))[0]
                 else:
                     self.cam_dev = None
             except Exception as e:
