@@ -41,17 +41,19 @@ class UsbCamSkill(MycroftSkill):
 
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
-        self.profile_name = self.user_info_available["user"]["preferred_name"]
-        if self.profile_name:
-            self.pic_path = self.configuration_available["dirVars"]["picsDir"] + \
-                "/UsbCam/" + self.profile_name + "/"
-            self.vid_path = self.configuration_available["dirVars"]["videoDir"] + \
-                "/UsbCam/" + self.profile_name + "/"
-        else:
-            self.pic_path = self.configuration_available["dirVars"]["picsDir"] + \
-                "/UsbCam/General/"
-            self.vid_path = self.configuration_available["dirVars"]["videoDir"] + \
-                "/UsbCam/General/"
+        # self.profile_name = self.user_info_available["user"]["preferred_name"]
+        # if self.profile_name:
+        #     self.pic_path = self.configuration_available["dirVars"]["picsDir"] + \
+        #         "/UsbCam/" + self.profile_name + "/"
+        #     self.vid_path = self.configuration_available["dirVars"]["videoDir"] + \
+        #         "/UsbCam/" + self.profile_name + "/"
+        # else:
+        #     self.pic_path = self.configuration_available["dirVars"]["picsDir"] + \
+        #         "/UsbCam/General/"
+        #     self.vid_path = self.configuration_available["dirVars"]["videoDir"] + \
+        #         "/UsbCam/General/"
+        self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
+        self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
 
         sound_path = dirname(abspath(__file__)) + '/res/wav/'
 
@@ -62,16 +64,16 @@ class UsbCamSkill(MycroftSkill):
         self.image_extension = ".jpg"
         self.video_extension = ".avi"
         if not self.server:
-            self.ensure_dir(self.pic_path)
-            self.ensure_dir(self.vid_path)
+            # self.ensure_dir(self.pic_path)
+            # self.ensure_dir(self.vid_path)
             try:
                 camera_id = int(self.configuration_available["devVars"].get("camDev", 0))
                 cam_devs = glob.glob("/dev/video*")
                 if len(cam_devs) > 0:
                     if f"/dev/video{camera_id}" in cam_devs:
-                        self.cam_dev = camera_id
+                        self.cam_dev = f"/dev/video{camera_id}"
                     else:
-                        self.cam_dev = sorted(glob.glob("/dev/video*"))[0]
+                        self.cam_dev = sorted(cam_devs)[0]
                 else:
                     self.cam_dev = None
             except Exception as e:
@@ -88,11 +90,17 @@ class UsbCamSkill(MycroftSkill):
     def handle_take_pic_intent(self, message):
         if ("picture" or "pic" or "photo") in message.data.get("utterance"):
             LOG.info("In picture")
-            LOG.info(message.data)
+            LOG.debug(message.data)
             today = datetime.datetime.today()
-            newest_pic = self.pic_path + "user_pic" + str(today).replace(" ", "_") + self.image_extension if \
-                ("user" or "my") in message.data.get("utterance") else self.pic_path + str(today).replace(" ", "_") \
-                + self.image_extension
+            user = self.get_utterance_user(message)
+            pic_path = os.path.join(self.pic_path, user)
+            if not os.path.exists(pic_path):
+                LOG.debug(f"Creating pictures path: {pic_path}")
+                os.makedirs(pic_path)
+            newest_pic = os.path.join(pic_path, "user_pic" + str(today).replace(" ", "_") + self.image_extension) if \
+                ("user" or "my") in message.data.get("utterance") else os.path.join(pic_path,
+                                                                                    str(today).replace(" ", "_")
+                                                                                    + self.image_extension)
             try:
                 LOG.info(type(message.context["mobile"]))
                 if message.context["mobile"]:
@@ -102,10 +110,11 @@ class UsbCamSkill(MycroftSkill):
                 elif self.server:
                     self.speak_dialog("ServerNotSupported", private=True)
                 else:
-                    if self.cam_dev:
+                    if self.cam_dev is not None:
                         play_wav(self.shutter_sound)
                         os.system(f"fswebcam -d {self.cam_dev} --delay 2 --skip 2 "
                                   f"-r 1280x720 --no-banner {newest_pic}")
+                        time.sleep(1)
                         self.display_image(image=newest_pic)
                     else:
                         self.speak_dialog("NoCamera", private=True)
@@ -124,7 +133,8 @@ class UsbCamSkill(MycroftSkill):
             elif self.server:
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
-                self.display_latest_pic(user=("user" or "my") in message.data.get("utterance"))
+                self.display_latest_pic(profile_pic=("user" or "my") in message.data.get("utterance"),
+                                        requested_user=self.get_utterance_user(message))
         else:
             if message.context["mobile"]:
                 # self.speak("MOBILE-INTENT LATEST_VIDEO")
@@ -132,15 +142,17 @@ class UsbCamSkill(MycroftSkill):
             elif self.server:
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
-                self.display_latest_vid(user=("user" or "my") in message.data.get("utterance"))
+                self.display_latest_vid(profile_vid=("user" or "my") in message.data.get("utterance"),
+                                        requested_user=self.get_utterance_user(message))
 
     def save_user_info(self, param, field):
         # self.create_signal("NGI_YAML_user_update")
         self.user_config.update_yaml_file(header="user", sub_header=field, value=param)
 
-    def display_latest_pic(self, secs=15, notify=True, user=False):
+    def display_latest_pic(self, secs=15, notify=True, profile_pic=False, requested_user="local"):
         try:
-            latest_pic = self.newest_file_in_dir(self.pic_path, self.image_extension) if not user \
+            latest_pic = self.newest_file_in_dir(os.path.join(self.pic_path, requested_user),
+                                                 self.image_extension) if not profile_pic \
                 else self.user_info_available["user"]["picture"]
             if latest_pic and os.path.isfile(latest_pic):
                 self.speak_dialog("ShowLatest", private=True)
@@ -151,10 +163,14 @@ class UsbCamSkill(MycroftSkill):
             LOG.error(e)
             self.speak_dialog("NothingToShow", {"kind": "pictures"}, private=True)
 
-    def display_latest_vid(self, user=False):
+    def display_latest_vid(self, profile_vid=False, requested_user="local"):
         try:
-            latest_vid = self.newest_file_in_dir(self.vid_path, self.video_extension) if not user \
+            latest_vid = self.newest_file_in_dir(os.path.join(self.vid_path, requested_user),
+                                                 self.video_extension) if not profile_vid \
                 else self.user_info_available["user"]["video"]
+            if self.gui_enabled:
+                # TODO: Display video in gui DM
+                pass
             if os.path.isfile(latest_vid):
                 self.speak_dialog("ShowLatest", private=True)
                 subprocess.Popen(["mpv", str(latest_vid)])
@@ -222,9 +238,14 @@ class UsbCamSkill(MycroftSkill):
                         self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
                     self.vidid += 1
                     play_wav(self.record_sound)
-                    path = self.vid_path + "v" + str(self.vidid) + ".avi" if not\
+                    vid_path = os.path.join(self.vid_path, self.get_utterance_user(message))
+                    if not os.path.exists(vid_path):
+                        LOG.debug(f"Creating video path: {vid_path}")
+                        os.makedirs(vid_path)
+
+                    path = vid_path + "v" + str(self.vidid) + ".avi" if not\
                         ("user" or "my") in message.data.get("utterance") else \
-                        self.vid_path + "user_video_v" + str(self.vidid) + ".avi"
+                        vid_path + "user_video_v" + str(self.vidid) + ".avi"
                     os.system(f"streamer -f rgb24 -i {self.cam_dev} -t 00:00:{secs} -o {path}.avi")
                     play_wav(self.notify_sound)
                     if ("user" or "my") in message.data.get("utterance"):
