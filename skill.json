@@ -1,0 +1,42 @@
+{
+    "title": "USB-Cam",
+    "url": "https://github.com/NeonGeckoCom/usb-cam.neon",
+    "summary": "Take pictures and videos.",
+    "short_description": "Take pictures and videos.",
+    "description": "The skill allows you to capture pictures and videos and saves them to your local device.",
+    "examples": [
+        "take a picture",
+        "take a video",
+        "record for 30 seconds",
+        "show me my last picture"
+    ],
+    "desktopFile": false,
+    "warning": "",
+    "systemDeps": false,
+    "requirements": {
+        "python": [],
+        "system": {},
+        "skill": []
+    },
+    "platforms": [
+        "i386",
+        "x86_64",
+        "ia64",
+        "arm64",
+        "arm"
+    ],
+    "branch": "master",
+    "license": "NeonAI License v1.0",
+    "icon": "https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png",
+    "category": "",
+    "categories": [
+        ""
+    ],
+    "tags": [
+        ""
+    ],
+    "skillname": "USB-Cam",
+    "authorname": "Neon",
+    "foldername": "usb-cam.neon",
+    "download_url": "https://api.github.com/repos/NeonGeckoCom/usb-cam.neon/zipball/master"
+}

@@ -1,10 +1,10 @@
-# ![](https://0000.us/klatchat/app/files/neon_images/icons/neon_paw.png)USB-Cam 
+# <img src='https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png' card_color="#FF8600" width="50" style="vertical-align:bottom">USB-Cam 
   
-# Summary  
+## Summary  
 
 Take pictures and videos.
   
-# Requirements  
+## Requirements  
 
 This skill requires a camera connected and configured to work in Linux.
 
@@ -18,11 +18,11 @@ The above requirements should be installed automatically, but can be installed m
     sudo apt install fswebcam streamer mpv
     ```
 
-# Description  
+## Description  
   
 The skill allows you to capture pictures and videos and saves them to your local device.
   
-# How to Use  
+## Examples  
   
 First, make your request:  
   
@@ -42,12 +42,12 @@ will be displayed on screen.
 If you are requesting your most recent picture or video, a notification sound will play and the image will be displayed
 on screen.
 
-# Location  
+## Location  
   
 
      ${skills}/usb-cam.neon
 
-# Files
+## Files
 <details>
 <summary>Click to expand.</summary>
 <br>
@@ -90,11 +90,11 @@ on screen.
 </details>
   
 
-# Class Diagram
+## Class Diagram
 [Click Here](https://0000.us/klatchat/app/files/neon_images/class_diagrams/usb-cam.png)
   
 
-# Available Intents
+## Available Intents
 <details>
 <summary>Show list</summary>
 <br>
@@ -165,7 +165,7 @@ on screen.
 </details>
 
 
-# Examples
+## Details
 
 ### Text
 
@@ -182,14 +182,14 @@ on screen.
 
 ### Video
 
-# Troubleshooting
+## Troubleshooting
 Ensure your webcam is connected and working in Ubuntu, you can check functionality in `Cheese`.  
     ```bash
     sudo apt install cheese
     ```
  
-# Contact Support
+## Contact Support
 Use the [link](https://neongecko.com/ContactUs) or [submit an issue on GitHub](https://help.github.com/en/articles/creating-an-issue)
 
-# Credits
+## Credits
 reginaneon [neongeckocom](https://neongecko.com/)
