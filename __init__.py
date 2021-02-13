@@ -31,7 +31,8 @@ from mycroft.util.parse import extract_number
 from mycroft.util.log import LOG
 from mycroft.util import play_wav
 from subprocess import DEVNULL, STDOUT
-from ovos_utils.gui import is_gui_connected
+from ovos_utils.gui import is_gui_installed
+
 
 # try:
 #     from mycroft.device import device
@@ -192,7 +193,7 @@ class UsbCamSkill(MycroftSkill):
         # method of displaying image
         if self.configuration_available["devVars"]["devType"] in ("pi", "neonPi"):
             os.system("sudo /home/pi/ngi_code/scripts/splash/splash_start " + image + " " + str(secs))
-        elif is_gui_connected(self.bus):
+        elif is_gui_installed():
             self.gui.show_image(image, fill="PreserveAspectFit")
             self.clear_gui_timeout(secs)
         else:
