@@ -34,27 +34,10 @@ from subprocess import DEVNULL, STDOUT
 from ovos_utils.gui import is_gui_installed
 
 
-# try:
-#     from mycroft.device import device
-# except ImportError:
-#     device = 'desktop'
-
-
 class UsbCamSkill(MycroftSkill):
 
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
-        # self.profile_name = self.user_info_available["user"]["preferred_name"]
-        # if self.profile_name:
-        #     self.pic_path = self.configuration_available["dirVars"]["picsDir"] + \
-        #         "/UsbCam/" + self.profile_name + "/"
-        #     self.vid_path = self.configuration_available["dirVars"]["videoDir"] + \
-        #         "/UsbCam/" + self.profile_name + "/"
-        # else:
-        #     self.pic_path = self.configuration_available["dirVars"]["picsDir"] + \
-        #         "/UsbCam/General/"
-        #     self.vid_path = self.configuration_available["dirVars"]["videoDir"] + \
-        #         "/UsbCam/General/"
         self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
         self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
 
