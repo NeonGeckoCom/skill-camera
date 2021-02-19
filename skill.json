@@ -14,10 +14,13 @@
     "warning": "",
     "systemDeps": false,
     "requirements": {
-        "python": [],
+        "python": [
+            "git+https://github.com/neongeckocom/neon-skill-utils"
+        ],
         "system": {},
         "skill": []
     },
+    "incompatible_skills": [],
     "platforms": [
         "i386",
         "x86_64",
