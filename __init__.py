@@ -99,7 +99,8 @@ class UsbCamSkill(MycroftSkill):
                 else:
                     if self.cam_dev is not None:
                         play_wav(self.shutter_sound)
-                        LOG.debug(f"TIME: to_speak, {time.time()}, {message.data['utterance']}, {message.context}")
+                        self.bus.emit(message.forward("neon.metric", {"name": "audio-response"}))
+                        # LOG.debug(f"TIME: to_speak, {time.time()}, {message.data['utterance']}, {message.context}")
                         os.system(f"fswebcam -d {self.cam_dev} --delay 2 --skip 2 "
                                   f"-r 1280x720 --no-banner {newest_pic}")
                         time.sleep(1)
