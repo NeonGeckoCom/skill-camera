@@ -88,18 +88,19 @@ class UsbCamSkill(MycroftSkill):
                                                                                     str(today).replace(" ", "_")
                                                                                     + self.image_extension)
             try:
-                LOG.info(type(message.context["mobile"]))
-                if message.context["mobile"]:
+                LOG.info(type(self.request_from_mobile(message)))
+                if self.request_from_mobile(message):
                     self.speak_dialog("LaunchCamera", private=True)
                     # self.speak("MOBILE-INTENT PICTURE")
-                    self.socket_io_emit('picture', '', message.context["flac_filename"])
+                    self.mobile_skill_intent("picture", {}, message)
+                    # self.socket_io_emit('picture', '', message.context["flac_filename"])
                 elif self.server:
                     self.speak_dialog("ServerNotSupported", private=True)
                 else:
                     if self.cam_dev is not None:
                         play_wav(self.shutter_sound)
-                        LOG.debug(f"TIME: to_speak, {time.time()}, {message.context['flac_filename']}, "
-                                  f"{message.data['utterance']}, {message.context}")
+                        self.bus.emit(message.forward("neon.metric", {"name": "audio-response"}))
+                        # LOG.debug(f"TIME: to_speak, {time.time()}, {message.data['utterance']}, {message.context}")
                         os.system(f"fswebcam -d {self.cam_dev} --delay 2 --skip 2 "
                                   f"-r 1280x720 --no-banner {newest_pic}")
                         time.sleep(1)
@@ -115,18 +116,20 @@ class UsbCamSkill(MycroftSkill):
     @intent_file_handler('ShowLastIntent.intent')
     def handle_show_last_intent(self, message):
         if "picture" in message.data.get("utterance"):
-            if message.context["mobile"]:
+            if self.request_from_mobile(message):
                 # self.speak("MOBILE-INTENT LATEST_PICTURE")
-                self.socket_io_emit('show_pic', '', message.context["flac_filename"])
+                self.mobile_skill_intent("show_pic", {}, message)
+                # self.socket_io_emit('show_pic', '', message.context["flac_filename"])
             elif self.server:
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
                 self.display_latest_pic(profile_pic=("user" or "my") in message.data.get("utterance"),
                                         requested_user=self.get_utterance_user(message))
         else:
-            if message.context["mobile"]:
+            if self.request_from_mobile(message):
                 # self.speak("MOBILE-INTENT LATEST_VIDEO")
-                self.socket_io_emit('show_vid', '', message.context["flac_filename"])
+                self.mobile_skill_intent("show_vid", {}, message)
+                # self.socket_io_emit('show_vid', '', message.context["flac_filename"])
             elif self.server:
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
@@ -194,10 +197,11 @@ class UsbCamSkill(MycroftSkill):
                 # if not self.server and not message.data.get("mobile"):
                 #     self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
 
-            if message.context["mobile"]:
+            if self.request_from_mobile(message):
                 self.speak_dialog("LaunchCamera", private=True)
                 # self.speak("MOBILE-INTENT VIDEO")
-                self.socket_io_emit('video', '', message.context["flac_filename"])
+                self.mobile_skill_intent("video", {}, message)
+                # self.socket_io_emit('video', '', message.context["flac_filename"])
             elif self.server:
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
@@ -214,8 +218,9 @@ class UsbCamSkill(MycroftSkill):
                 playback = ('no playback' or 'without playback') in message.data.get("utterance")
 
                 # Determine if we can handle this
-                if message.context["mobile"]:
-                    self.socket_io_emit('video', f'&duration={duration}', message.context["flac_filename"])
+                if self.request_from_mobile(message):
+                    self.mobile_skill_intent("video", {"duration": duration}, message)
+                    # self.socket_io_emit('video', f'&duration={duration}', message.context["flac_filename"])
                     self.speak("LaunchCamera", private=True)
                 elif self.server:
                     self.speak_dialog("ServerNotSupported", private=True)
