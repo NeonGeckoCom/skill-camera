@@ -24,17 +24,18 @@ import time
 from os.path import dirname, abspath
 import subprocess
 
-from mycroft.skills.core import MycroftSkill, intent_file_handler
+from mycroft.skills.core import intent_file_handler
 # from mycroft.util import play_wav
 # from mycroft.device import device as d_hw
 from mycroft.util.parse import extract_number
-from mycroft.util.log import LOG
+# from mycroft.util.log import LOG
 from mycroft.util import play_wav
 from subprocess import DEVNULL, STDOUT
 from ovos_utils.gui import is_gui_installed
+from neon_utils.skills.neon_skill import NeonSkill, LOG
 
 
-class UsbCamSkill(MycroftSkill):
+class UsbCamSkill(NeonSkill):
 
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
