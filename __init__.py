@@ -182,9 +182,9 @@ class UsbCamSkill(NeonSkill):
             play_wav(self.notify_sound)
 
         # method of displaying image
-        if self.configuration_available["devVars"]["devType"] in ("pi", "neonPi"):
-            os.system("sudo /home/pi/ngi_code/scripts/splash/splash_start " + image + " " + str(secs))
-        elif is_gui_installed():
+        # if self.configuration_available["devVars"]["devType"] in ("pi", "neonPi"):
+        #     os.system("sudo /home/pi/ngi_code/scripts/splash/splash_start " + image + " " + str(secs))
+        if is_gui_installed():
             self.gui.show_image(image, fill="PreserveAspectFit")
             self.clear_gui_timeout(secs)
         else:
