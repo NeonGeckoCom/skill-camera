@@ -39,9 +39,13 @@ class UsbCamSkill(NeonSkill):
 
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
-        self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
-        self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
-
+        try:
+            self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
+            self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
+        except Exception as e:
+            LOG.error(e)
+            self.pic_path = os.path.expanduser("~/Pictures")
+            self.vid_path = os.path.expanduser("~/Videos")
         sound_path = dirname(abspath(__file__)) + '/res/wav/'
 
         self.notify_sound = sound_path + 'notify.wav'
