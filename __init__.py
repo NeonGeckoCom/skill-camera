@@ -58,7 +58,7 @@ class UsbCamSkill(NeonSkill):
             # self.ensure_dir(self.pic_path)
             # self.ensure_dir(self.vid_path)
             try:
-                camera_id = int(self.configuration_available["devVars"].get("camDev", 0))
+                camera_id = int(self.configuration_available.get("devVars", {}).get("camDev", 0))
                 cam_devs = glob.glob("/dev/video*")
                 if len(cam_devs) > 0:
                     if f"/dev/video{camera_id}" in cam_devs:
