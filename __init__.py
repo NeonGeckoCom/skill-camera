@@ -24,6 +24,8 @@ import time
 from os.path import dirname, abspath
 import subprocess
 
+from neon_utils.message_utils import request_from_mobile
+
 from mycroft.skills.core import intent_file_handler
 # from mycroft.util import play_wav
 # from mycroft.device import device as d_hw
@@ -93,8 +95,8 @@ class UsbCamSkill(NeonSkill):
                                                                                     str(today).replace(" ", "_")
                                                                                     + self.image_extension)
             try:
-                LOG.info(type(self.request_from_mobile(message)))
-                if self.request_from_mobile(message):
+                # LOG.info(type(self.request_from_mobile(message)))
+                if request_from_mobile(message):
                     self.speak_dialog("LaunchCamera", private=True)
                     # self.speak("MOBILE-INTENT PICTURE")
                     self.mobile_skill_intent("picture", {}, message)
@@ -121,7 +123,7 @@ class UsbCamSkill(NeonSkill):
     @intent_file_handler('ShowLastIntent.intent')
     def handle_show_last_intent(self, message):
         if "picture" in message.data.get("utterance"):
-            if self.request_from_mobile(message):
+            if request_from_mobile(message):
                 # self.speak("MOBILE-INTENT LATEST_PICTURE")
                 self.mobile_skill_intent("show_pic", {}, message)
                 # self.socket_io_emit('show_pic', '', message.context["flac_filename"])
@@ -131,7 +133,7 @@ class UsbCamSkill(NeonSkill):
                 self.display_latest_pic(profile_pic=("user" or "my") in message.data.get("utterance"),
                                         requested_user=self.get_utterance_user(message))
         else:
-            if self.request_from_mobile(message):
+            if request_from_mobile(message):
                 # self.speak("MOBILE-INTENT LATEST_VIDEO")
                 self.mobile_skill_intent("show_vid", {}, message)
                 # self.socket_io_emit('show_vid', '', message.context["flac_filename"])
@@ -202,7 +204,7 @@ class UsbCamSkill(NeonSkill):
                 # if not self.server and not message.data.get("mobile"):
                 #     self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
 
-            if self.request_from_mobile(message):
+            if request_from_mobile(message):
                 self.speak_dialog("LaunchCamera", private=True)
                 # self.speak("MOBILE-INTENT VIDEO")
                 self.mobile_skill_intent("video", {}, message)
@@ -223,7 +225,7 @@ class UsbCamSkill(NeonSkill):
                 playback = ('no playback' or 'without playback') in message.data.get("utterance")
 
                 # Determine if we can handle this
-                if self.request_from_mobile(message):
+                if request_from_mobile(message):
                     self.mobile_skill_intent("video", {"duration": duration}, message)
                     # self.socket_io_emit('video', f'&duration={duration}', message.context["flac_filename"])
                     self.speak("LaunchCamera", private=True)
