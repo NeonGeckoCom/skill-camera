@@ -151,7 +151,7 @@ class UsbCamSkill(NeonSkill):
         try:
             latest_pic = self.newest_file_in_dir(os.path.join(self.pic_path, requested_user),
                                                  self.image_extension) if not profile_pic \
-                else self.user_info_available["user"]["picture"]
+                else self.preference_user()["picture"]
             if latest_pic and os.path.isfile(latest_pic):
                 self.speak_dialog("ShowLatest", private=True)
                 self.display_image(latest_pic, secs=secs, notify=notify)
@@ -165,7 +165,7 @@ class UsbCamSkill(NeonSkill):
         try:
             latest_vid = self.newest_file_in_dir(os.path.join(self.vid_path, requested_user),
                                                  self.video_extension) if not profile_vid \
-                else self.user_info_available["user"]["video"]
+                else self.preference_user()["video"]
             if self.gui_enabled:
                 # TODO: Display video in gui DM
                 pass
