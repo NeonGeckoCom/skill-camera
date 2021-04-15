@@ -24,23 +24,30 @@ import time
 from os.path import dirname, abspath
 import subprocess
 
-from mycroft.skills.core import MycroftSkill, intent_file_handler
+from neon_utils.message_utils import request_from_mobile
+
+from mycroft.skills.core import intent_file_handler
 # from mycroft.util import play_wav
 # from mycroft.device import device as d_hw
 from mycroft.util.parse import extract_number
-from mycroft.util.log import LOG
+# from mycroft.util.log import LOG
 from mycroft.util import play_wav
 from subprocess import DEVNULL, STDOUT
 from ovos_utils.gui import is_gui_installed
+from neon_utils.skills.neon_skill import NeonSkill, LOG
 
 
-class UsbCamSkill(MycroftSkill):
+class UsbCamSkill(NeonSkill):
 
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
-        self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
-        self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
-
+        try:
+            self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
+            self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
+        except Exception as e:
+            LOG.error(e)
+            self.pic_path = os.path.expanduser("~/Pictures")
+            self.vid_path = os.path.expanduser("~/Videos")
         sound_path = dirname(abspath(__file__)) + '/res/wav/'
 
         self.notify_sound = sound_path + 'notify.wav'
@@ -53,7 +60,7 @@ class UsbCamSkill(MycroftSkill):
             # self.ensure_dir(self.pic_path)
             # self.ensure_dir(self.vid_path)
             try:
-                camera_id = int(self.configuration_available["devVars"].get("camDev", 0))
+                camera_id = int(self.configuration_available.get("devVars", {}).get("camDev", 0))
                 cam_devs = glob.glob("/dev/video*")
                 if len(cam_devs) > 0:
                     if f"/dev/video{camera_id}" in cam_devs:
@@ -88,8 +95,8 @@ class UsbCamSkill(MycroftSkill):
                                                                                     str(today).replace(" ", "_")
                                                                                     + self.image_extension)
             try:
-                LOG.info(type(self.request_from_mobile(message)))
-                if self.request_from_mobile(message):
+                # LOG.info(type(self.request_from_mobile(message)))
+                if request_from_mobile(message):
                     self.speak_dialog("LaunchCamera", private=True)
                     # self.speak("MOBILE-INTENT PICTURE")
                     self.mobile_skill_intent("picture", {}, message)
@@ -116,7 +123,7 @@ class UsbCamSkill(MycroftSkill):
     @intent_file_handler('ShowLastIntent.intent')
     def handle_show_last_intent(self, message):
         if "picture" in message.data.get("utterance"):
-            if self.request_from_mobile(message):
+            if request_from_mobile(message):
                 # self.speak("MOBILE-INTENT LATEST_PICTURE")
                 self.mobile_skill_intent("show_pic", {}, message)
                 # self.socket_io_emit('show_pic', '', message.context["flac_filename"])
@@ -126,7 +133,7 @@ class UsbCamSkill(MycroftSkill):
                 self.display_latest_pic(profile_pic=("user" or "my") in message.data.get("utterance"),
                                         requested_user=self.get_utterance_user(message))
         else:
-            if self.request_from_mobile(message):
+            if request_from_mobile(message):
                 # self.speak("MOBILE-INTENT LATEST_VIDEO")
                 self.mobile_skill_intent("show_vid", {}, message)
                 # self.socket_io_emit('show_vid', '', message.context["flac_filename"])
@@ -177,9 +184,9 @@ class UsbCamSkill(MycroftSkill):
             play_wav(self.notify_sound)
 
         # method of displaying image
-        if self.configuration_available["devVars"]["devType"] in ("pi", "neonPi"):
-            os.system("sudo /home/pi/ngi_code/scripts/splash/splash_start " + image + " " + str(secs))
-        elif is_gui_installed():
+        # if self.configuration_available["devVars"]["devType"] in ("pi", "neonPi"):
+        #     os.system("sudo /home/pi/ngi_code/scripts/splash/splash_start " + image + " " + str(secs))
+        if is_gui_installed():
             self.gui.show_image(image, fill="PreserveAspectFit")
             self.clear_gui_timeout(secs)
         else:
@@ -197,7 +204,7 @@ class UsbCamSkill(MycroftSkill):
                 # if not self.server and not message.data.get("mobile"):
                 #     self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
 
-            if self.request_from_mobile(message):
+            if request_from_mobile(message):
                 self.speak_dialog("LaunchCamera", private=True)
                 # self.speak("MOBILE-INTENT VIDEO")
                 self.mobile_skill_intent("video", {}, message)
@@ -218,7 +225,7 @@ class UsbCamSkill(MycroftSkill):
                 playback = ('no playback' or 'without playback') in message.data.get("utterance")
 
                 # Determine if we can handle this
-                if self.request_from_mobile(message):
+                if request_from_mobile(message):
                     self.mobile_skill_intent("video", {"duration": duration}, message)
                     # self.socket_io_emit('video', f'&duration={duration}', message.context["flac_filename"])
                     self.speak("LaunchCamera", private=True)
