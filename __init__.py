@@ -24,6 +24,7 @@ import time
 from os.path import dirname, abspath
 import subprocess
 
+from neon_utils.file_utils import get_most_recent_file_in_dir
 from neon_utils.message_utils import request_from_mobile
 
 from mycroft.skills.core import intent_file_handler
@@ -149,8 +150,8 @@ class UsbCamSkill(NeonSkill):
 
     def display_latest_pic(self, secs=15, notify=True, profile_pic=False, requested_user="local"):
         try:
-            latest_pic = self.newest_file_in_dir(os.path.join(self.pic_path, requested_user),
-                                                 self.image_extension) if not profile_pic \
+            latest_pic = get_most_recent_file_in_dir(os.path.join(self.pic_path, requested_user),
+                                                     self.image_extension) if not profile_pic \
                 else self.preference_user()["picture"]
             if latest_pic and os.path.isfile(latest_pic):
                 self.speak_dialog("ShowLatest", private=True)
@@ -163,8 +164,8 @@ class UsbCamSkill(NeonSkill):
 
     def display_latest_vid(self, profile_vid=False, requested_user="local"):
         try:
-            latest_vid = self.newest_file_in_dir(os.path.join(self.vid_path, requested_user),
-                                                 self.video_extension) if not profile_vid \
+            latest_vid = get_most_recent_file_in_dir(os.path.join(self.vid_path, requested_user),
+                                                     self.video_extension) if not profile_vid \
                 else self.preference_user()["video"]
             if self.gui_enabled:
                 # TODO: Display video in gui DM
