@@ -79,6 +79,43 @@ class UsbCamSkill(NeonSkill):
     def initialize(self):
         # Uses `duration` from mycroft-timer skill
         self.register_entity_file('duration.entity')
+        # Register Camera GUI Events
+        self.gui.register_handler(
+            "CameraSkill.ViewPortStatus", self.handle_camera_status
+        )
+        self.gui.register_handler(
+            "CameraSkill.EndProcess", self.handle_camera_completed
+        )
+
+    def handle_camera_completed(self, _=None):
+        """Close the Camera GUI when finished."""
+        self.gui.remove_page("Camera.qml")
+        self.gui.release()
+
+    def handle_camera_status(self, message):
+        """Handle Camera GUI status changes."""
+        current_status = message.data.get("status")
+        if current_status == "generic":
+            self.gui["singleshot_mode"] = False
+        if current_status == "imagetaken":
+            self.gui["singleshot_mode"] = False
+        if current_status == "singleshot":
+            self.gui["singleshot_mode"] = True
+
+    def handle_camera_activity(self, activity):
+        """Perform camera action.
+
+        Arguments:
+            activity (str): the type of action to take, one of:
+                "generic" - open the camera app
+                "singleshot" - take a single photo
+        """
+        self.gui["save_path"] = self.pic_path
+        if activity == "singleshot":
+            self.gui["singleshot_mode"] = True
+        if activity == "generic":
+            self.gui["singleshot_mode"] = False
+        self.gui.show_page("Camera.qml", override_idle=60)
 
     @intent_file_handler('TakePicIntent.intent')
     def handle_take_pic_intent(self, message):
@@ -104,6 +141,9 @@ class UsbCamSkill(NeonSkill):
                     # self.socket_io_emit('picture', '', message.context["flac_filename"])
                 elif self.server:
                     self.speak_dialog("ServerNotSupported", private=True)
+                elif self.gui_enabled:
+                    self.gui["singleshot_mode"] = False
+                    self.handle_camera_activity("singleshot")
                 else:
                     if self.cam_dev is not None:
                         play_wav(self.shutter_sound)
@@ -298,7 +338,7 @@ class UsbCamSkill(NeonSkill):
     #     return max(paths, key=os.path.getmtime)
 
     def stop(self):
-        pass
+        self.handle_camera_completed()
 
 
 def create_skill():
