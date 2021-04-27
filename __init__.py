@@ -144,6 +144,7 @@ class UsbCamSkill(NeonSkill):
                 elif self.gui_enabled:
                     self.gui["singleshot_mode"] = False
                     self.handle_camera_activity("singleshot")
+                    self.bus.emit(message.forward("neon.metric", {"name": "audio-response"}))
                 else:
                     if self.cam_dev is not None:
                         play_wav(self.shutter_sound)
