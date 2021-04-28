@@ -43,8 +43,8 @@ class UsbCamSkill(NeonSkill):
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
         try:
-            self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
-            self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
+            self.pic_path = os.path.join(self.local_config["dirVars"]["picsDir"], "UsbCam")
+            self.vid_path = os.path.join(self.local_config["dirVars"]["videoDir"], "UsbCam")
         except Exception as e:
             LOG.error(e)
             self.pic_path = os.path.expanduser("~/Pictures")
