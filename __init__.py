@@ -24,6 +24,7 @@ import time
 from os.path import dirname, abspath
 import subprocess
 
+from neon_utils.file_utils import get_most_recent_file_in_dir
 from neon_utils.message_utils import request_from_mobile
 
 from mycroft.skills.core import intent_file_handler
@@ -42,8 +43,8 @@ class UsbCamSkill(NeonSkill):
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
         try:
-            self.pic_path = os.path.join(self.configuration_available["dirVars"]["picsDir"], "UsbCam")
-            self.vid_path = os.path.join(self.configuration_available["dirVars"]["videoDir"], "UsbCam")
+            self.pic_path = os.path.join(self.local_config["dirVars"]["picsDir"], "UsbCam")
+            self.vid_path = os.path.join(self.local_config["dirVars"]["videoDir"], "UsbCam")
         except Exception as e:
             LOG.error(e)
             self.pic_path = os.path.expanduser("~/Pictures")
@@ -78,6 +79,43 @@ class UsbCamSkill(NeonSkill):
     def initialize(self):
         # Uses `duration` from mycroft-timer skill
         self.register_entity_file('duration.entity')
+        # Register Camera GUI Events
+        self.gui.register_handler(
+            "CameraSkill.ViewPortStatus", self.handle_camera_status
+        )
+        self.gui.register_handler(
+            "CameraSkill.EndProcess", self.handle_camera_completed
+        )
+
+    def handle_camera_completed(self, _=None):
+        """Close the Camera GUI when finished."""
+        self.gui.remove_page("Camera.qml")
+        self.gui.release()
+
+    def handle_camera_status(self, message):
+        """Handle Camera GUI status changes."""
+        current_status = message.data.get("status")
+        if current_status == "generic":
+            self.gui["singleshot_mode"] = False
+        if current_status == "imagetaken":
+            self.gui["singleshot_mode"] = False
+        if current_status == "singleshot":
+            self.gui["singleshot_mode"] = True
+
+    def handle_camera_activity(self, activity):
+        """Perform camera action.
+
+        Arguments:
+            activity (str): the type of action to take, one of:
+                "generic" - open the camera app
+                "singleshot" - take a single photo
+        """
+        self.gui["save_path"] = self.pic_path
+        if activity == "singleshot":
+            self.gui["singleshot_mode"] = True
+        if activity == "generic":
+            self.gui["singleshot_mode"] = False
+        self.gui.show_page("Camera.qml", override_idle=60)
 
     @intent_file_handler('TakePicIntent.intent')
     def handle_take_pic_intent(self, message):
@@ -103,6 +141,10 @@ class UsbCamSkill(NeonSkill):
                     # self.socket_io_emit('picture', '', message.context["flac_filename"])
                 elif self.server:
                     self.speak_dialog("ServerNotSupported", private=True)
+                elif self.gui_enabled:
+                    self.gui["singleshot_mode"] = False
+                    self.handle_camera_activity("singleshot")
+                    self.bus.emit(message.forward("neon.metric", {"name": "audio-response"}))
                 else:
                     if self.cam_dev is not None:
                         play_wav(self.shutter_sound)
@@ -149,8 +191,8 @@ class UsbCamSkill(NeonSkill):
 
     def display_latest_pic(self, secs=15, notify=True, profile_pic=False, requested_user="local"):
         try:
-            latest_pic = self.newest_file_in_dir(os.path.join(self.pic_path, requested_user),
-                                                 self.image_extension) if not profile_pic \
+            latest_pic = get_most_recent_file_in_dir(os.path.join(self.pic_path, requested_user),
+                                                     self.image_extension) if not profile_pic \
                 else self.preference_user()["picture"]
             if latest_pic and os.path.isfile(latest_pic):
                 self.speak_dialog("ShowLatest", private=True)
@@ -163,8 +205,8 @@ class UsbCamSkill(NeonSkill):
 
     def display_latest_vid(self, profile_vid=False, requested_user="local"):
         try:
-            latest_vid = self.newest_file_in_dir(os.path.join(self.vid_path, requested_user),
-                                                 self.video_extension) if not profile_vid \
+            latest_vid = get_most_recent_file_in_dir(os.path.join(self.vid_path, requested_user),
+                                                     self.video_extension) if not profile_vid \
                 else self.preference_user()["video"]
             if self.gui_enabled:
                 # TODO: Display video in gui DM
@@ -297,7 +339,7 @@ class UsbCamSkill(NeonSkill):
     #     return max(paths, key=os.path.getmtime)
 
     def stop(self):
-        pass
+        self.handle_camera_completed()
 
 
 def create_skill():
