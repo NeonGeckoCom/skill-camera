@@ -40,6 +40,5 @@
     ],
     "skillname": "USB-Cam",
     "authorname": "Neon",
-    "foldername": "usb-cam.neon",
-    "download_url": "https://api.github.com/repos/NeonGeckoCom/usb-cam.neon/zipball/master"
+    "foldername": "usb-cam.neon"
 }
