@@ -43,13 +43,13 @@ class UsbCamSkill(NeonSkill):
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="UsbCamSkill")
         try:
-            self.pic_path = os.path.join(self.local_config["dirVars"]["picsDir"], "UsbCam")
-            self.vid_path = os.path.join(self.local_config["dirVars"]["videoDir"], "UsbCam")
+            self.pic_path = os.path.join(os.path.expanduser(self.local_config["dirVars"]["picsDir"]), "UsbCam")
+            self.vid_path = os.path.join(os.path.expanduser(self.local_config["dirVars"]["videoDir"]), "UsbCam")
         except Exception as e:
             LOG.error(e)
             self.pic_path = os.path.expanduser("~/Pictures")
             self.vid_path = os.path.expanduser("~/Videos")
-        sound_path = dirname(abspath(__file__)) + '/res/wav/'
+        sound_path = dirname(abspath(__file__)) + '/res/wav/'  # TODO: This should probably use resolve_resource_file DM
 
         self.notify_sound = sound_path + 'notify.wav'
         self.shutter_sound = sound_path + 'shutter.wav'
