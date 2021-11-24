@@ -194,3 +194,7 @@ Use the [link](https://neongecko.com/ContactUs) or [submit an issue on GitHub](h
 ## Credits
 [NeonGeckoCom](https://github.com/NeonGeckoCom)
 [reginaneon](https://github.com/reginaneon)
+
+## Tags
+#NeonGecko Original
+#NeonAI
