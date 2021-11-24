@@ -1,6 +1,8 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2021 Neongecko.com Inc.
+# Copyright 2008-2022 Neongecko.com Inc.
+# Authors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -48,7 +50,7 @@ from neon_utils.skills.neon_skill import NeonSkill, LOG
 class UsbCamSkill(NeonSkill):
 
     def __init__(self):
-        super(UsbCamSkill, self).__init__(name="UsbCamSkill")
+        super(UsbCamSkill, self).__init__(name="Camera")
         try:
             self.pic_path = os.path.join(os.path.expanduser(self.local_config["dirVars"]["picsDir"]), "UsbCam")
             self.vid_path = os.path.join(os.path.expanduser(self.local_config["dirVars"]["videoDir"]), "UsbCam")

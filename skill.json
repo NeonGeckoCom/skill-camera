@@ -1,6 +1,6 @@
 {
-    "title": "USB-Cam",
-    "url": "https://github.com/NeonGeckoCom/usb-cam.neon",
+    "title": "Camera",
+    "url": "https://github.com/NeonGeckoCom/skill-camera.git",
     "summary": "Take pictures and videos.",
     "short_description": "Take pictures and videos.",
     "description": "The skill allows you to capture pictures and videos and saves them to your local device.",
@@ -29,7 +29,7 @@
         "arm"
     ],
     "branch": "master",
-    "license": "NeonAI License v1.0",
+    "license": "BSD-3-Clause",
     "icon": "https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png",
     "category": "",
     "categories": [
@@ -38,7 +38,12 @@
     "tags": [
         ""
     ],
-    "skillname": "USB-Cam",
+    "credits": [
+        "NeonGeckoCom",
+        "reginaneon"
+    ],
+    "skillname": "Camera",
     "authorname": "NeonGeckoCom",
-    "foldername": null
+    "foldername": null,
+    "troubleshooting": "Ensure your webcam is connected and working in Ubuntu, you can check functionality in `Cheese`.     ```bash     sudo apt install cheese     ```"
 }
