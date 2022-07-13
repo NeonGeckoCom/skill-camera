@@ -45,19 +45,17 @@ from mycroft.util import play_wav
 from subprocess import DEVNULL, STDOUT
 from ovos_utils.gui import is_gui_installed
 from neon_utils.skills.neon_skill import NeonSkill, LOG
+from neon_utils.message_utils import get_message_user
 
 
 class UsbCamSkill(NeonSkill):
 
     def __init__(self):
         super(UsbCamSkill, self).__init__(name="Camera")
-        try:
-            self.pic_path = os.path.join(os.path.expanduser(self.local_config["dirVars"]["picsDir"]), "UsbCam")
-            self.vid_path = os.path.join(os.path.expanduser(self.local_config["dirVars"]["videoDir"]), "UsbCam")
-        except Exception as e:
-            LOG.error(e)
-            self.pic_path = os.path.expanduser("~/Pictures")
-            self.vid_path = os.path.expanduser("~/Videos")
+        self.pic_path = os.path.expanduser("~/Pictures/Neon")
+        self.vid_path = os.path.expanduser("~/Videos/Neon")
+        os.makedirs(self.pic_path, exist_ok=True)
+        os.makedirs(self.vid_path, exist_ok=True)
         sound_path = dirname(abspath(__file__)) + '/res/wav/'  # TODO: This should probably use resolve_resource_file DM
 
         self.notify_sound = sound_path + 'notify.wav'
@@ -66,22 +64,19 @@ class UsbCamSkill(NeonSkill):
 
         self.image_extension = ".jpg"
         self.video_extension = ".avi"
-        if not self.server:
-            # self.ensure_dir(self.pic_path)
-            # self.ensure_dir(self.vid_path)
-            try:
-                camera_id = int(self.local_config.get("devVars", {}).get("camDev", 0))
-                cam_devs = glob.glob("/dev/video*")
-                if len(cam_devs) > 0:
-                    if f"/dev/video{camera_id}" in cam_devs:
-                        self.cam_dev = f"/dev/video{camera_id}"
-                    else:
-                        self.cam_dev = sorted(cam_devs)[0]
+        try:
+            camera_id = 0  # int(self.local_config.get("devVars", {}).get("camDev", 0))
+            cam_devs = glob.glob("/dev/video*")
+            if len(cam_devs) > 0:
+                if f"/dev/video{camera_id}" in cam_devs:
+                    self.cam_dev = f"/dev/video{camera_id}"
                 else:
-                    self.cam_dev = None
-            except Exception as e:
+                    self.cam_dev = sorted(cam_devs)[0]
+            else:
                 self.cam_dev = None
-                LOG.error(e)
+        except Exception as e:
+            self.cam_dev = None
+            LOG.error(e)
 
         self.vidid = 0
 
@@ -132,7 +127,7 @@ class UsbCamSkill(NeonSkill):
             LOG.info("In picture")
             LOG.debug(message.data)
             today = datetime.datetime.today()
-            user = self.get_utterance_user(message)
+            user = get_message_user(message)
             pic_path = os.path.join(self.pic_path, user)
             if not os.path.exists(pic_path):
                 LOG.debug(f"Creating pictures path: {pic_path}")
@@ -145,10 +140,11 @@ class UsbCamSkill(NeonSkill):
                 # LOG.info(type(self.request_from_mobile(message)))
                 if request_from_mobile(message):
                     self.speak_dialog("LaunchCamera", private=True)
+                    # TODO
                     # self.speak("MOBILE-INTENT PICTURE")
-                    self.mobile_skill_intent("picture", {}, message)
+                    # self.mobile_skill_intent("picture", {}, message)
                     # self.socket_io_emit('picture', '', message.context["flac_filename"])
-                elif self.server:
+                elif message.context.get("klat_data"):
                     self.speak_dialog("ServerNotSupported", private=True)
                 elif self.gui_enabled:
                     self.gui["singleshot_mode"] = False
@@ -167,42 +163,42 @@ class UsbCamSkill(NeonSkill):
                         self.speak_dialog("NoCamera", private=True)
             except Exception as e:
                 LOG.error(e)
-            finally:
-                if ("user" or "my") in message.data.get("utterance"):
-                    self.save_user_info(newest_pic, "picture")
+            # finally:
+            #     if ("user" or "my") in message.data.get("utterance"):
+            #         self.save_user_info(newest_pic, "picture")
 
     @intent_file_handler('ShowLastIntent.intent')
     def handle_show_last_intent(self, message):
         if "picture" in message.data.get("utterance"):
             if request_from_mobile(message):
+                pass
+                # TODO
                 # self.speak("MOBILE-INTENT LATEST_PICTURE")
-                self.mobile_skill_intent("show_pic", {}, message)
+                # self.mobile_skill_intent("show_pic", {}, message)
                 # self.socket_io_emit('show_pic', '', message.context["flac_filename"])
-            elif self.server:
+            elif message.context.get("klat_data"):
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
                 self.display_latest_pic(profile_pic=("user" or "my") in message.data.get("utterance"),
-                                        requested_user=self.get_utterance_user(message))
+                                        requested_user=get_message_user(message))
         else:
             if request_from_mobile(message):
+                pass
+                # TODO
                 # self.speak("MOBILE-INTENT LATEST_VIDEO")
-                self.mobile_skill_intent("show_vid", {}, message)
+                # self.mobile_skill_intent("show_vid", {}, message)
                 # self.socket_io_emit('show_vid', '', message.context["flac_filename"])
-            elif self.server:
+            elif message.context.get("klat_data"):
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
                 self.display_latest_vid(profile_vid=("user" or "my") in message.data.get("utterance"),
-                                        requested_user=self.get_utterance_user(message))
-
-    def save_user_info(self, param, field):
-        # self.create_signal("NGI_YAML_user_update")
-        self.user_config.update_yaml_file(header="user", sub_header=field, value=param)
+                                        requested_user=get_message_user(message))
 
     def display_latest_pic(self, secs=15, notify=True, profile_pic=False, requested_user="local"):
         try:
             latest_pic = get_most_recent_file_in_dir(os.path.join(self.pic_path, requested_user),
                                                      self.image_extension) if not profile_pic \
-                else self.preference_user()["picture"]
+                else None  # self.preference_user()["picture"]
             if latest_pic and os.path.isfile(latest_pic):
                 self.speak_dialog("ShowLatest", private=True)
                 self.display_image(latest_pic, secs=secs, notify=notify)
@@ -216,7 +212,7 @@ class UsbCamSkill(NeonSkill):
         try:
             latest_vid = get_most_recent_file_in_dir(os.path.join(self.vid_path, requested_user),
                                                      self.video_extension) if not profile_vid \
-                else self.preference_user()["video"]
+                else None  # self.preference_user()["video"]
             if self.gui_enabled:
                 # TODO: Display video in gui DM
                 pass
@@ -239,7 +235,6 @@ class UsbCamSkill(NeonSkill):
         #     os.system("sudo /home/pi/ngi_code/scripts/splash/splash_start " + image + " " + str(secs))
         if is_gui_installed():
             self.gui.show_image(image, fill="PreserveAspectFit")
-            self.clear_gui_timeout(secs)
         else:
             os.system("timeout " + str(secs) + " eog " + image)
 
@@ -252,15 +247,16 @@ class UsbCamSkill(NeonSkill):
             except KeyError:
                 duration = "5 seconds"
                 heard_duration = False
-                # if not self.server and not message.data.get("mobile"):
+                # if not message.context.get("klat_data") and not message.data.get("mobile"):
                 #     self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
 
             if request_from_mobile(message):
                 self.speak_dialog("LaunchCamera", private=True)
+                # TODO
                 # self.speak("MOBILE-INTENT VIDEO")
-                self.mobile_skill_intent("video", {}, message)
+                # self.mobile_skill_intent("video", {}, message)
                 # self.socket_io_emit('video', '', message.context["flac_filename"])
-            elif self.server:
+            elif message.context.get("klat_data"):
                 self.speak_dialog("ServerNotSupported", private=True)
             else:
                 # Determine Duration
@@ -277,10 +273,11 @@ class UsbCamSkill(NeonSkill):
 
                 # Determine if we can handle this
                 if request_from_mobile(message):
-                    self.mobile_skill_intent("video", {"duration": duration}, message)
+                    # TODO
+                    # self.mobile_skill_intent("video", {"duration": duration}, message)
                     # self.socket_io_emit('video', f'&duration={duration}', message.context["flac_filename"])
                     self.speak("LaunchCamera", private=True)
-                elif self.server:
+                elif message.context.get("klat_data"):
                     self.speak_dialog("ServerNotSupported", private=True)
                 elif self.cam_dev:
                     if heard_duration:
@@ -289,7 +286,7 @@ class UsbCamSkill(NeonSkill):
                         self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
                     self.vidid += 1
                     play_wav(self.record_sound)
-                    vid_path = os.path.join(self.vid_path, self.get_utterance_user(message))
+                    vid_path = os.path.join(self.vid_path, get_message_user(message))
                     if not os.path.exists(vid_path):
                         LOG.debug(f"Creating video path: {vid_path}")
                         os.makedirs(vid_path)
@@ -299,8 +296,8 @@ class UsbCamSkill(NeonSkill):
                         vid_path + "user_video_v" + str(self.vidid) + ".avi"
                     os.system(f"streamer -f rgb24 -i {self.cam_dev} -t 00:00:{secs} -o {path}.avi")
                     play_wav(self.notify_sound)
-                    if ("user" or "my") in message.data.get("utterance"):
-                        self.save_user_info(path, 'video')
+                    # if ("user" or "my") in message.data.get("utterance"):
+                    #     self.save_user_info(path, 'video')
 
                     if playback:
                         time.sleep(1)
