@@ -79,12 +79,12 @@ Mycroft.Delegate {
             captureMode: Camera.CaptureStillImage
             viewfinder.resolution: "640x480"
             exposure {
-                exposureCompensation: 1.0
-                exposureMode: Camera.ExposurePortrait
+                exposureCompensation: 10.0
+                exposureMode: Camera.ExposureAuto
             }
             digitalZoom: zoomSlider.value
 
-            flash.mode: Camera.FlashRedEyeReduction
+            flash.mode: Camera.FlashOff
 
             imageCapture {
                 id: capImage
