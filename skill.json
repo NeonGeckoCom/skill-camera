@@ -5,7 +5,7 @@
     "short_description": "Take pictures and videos.",
     "description": "The skill allows you to capture pictures and videos and saves them to your local device.",
     "examples": [
-        "take a picture."
+        "Take a picture."
     ],
     "desktopFile": false,
     "warning": "",
