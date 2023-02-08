@@ -7,6 +7,8 @@ Take pictures and videos.
 ## Description  
   
 The skill allows you to capture pictures and videos and saves them to your local device.
+
+Note: Videos aren't currently saved, but images can be found in ~/Pictures/Neon.
   
 ## Examples  
 
