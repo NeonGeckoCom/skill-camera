@@ -37,14 +37,14 @@ from neon_utils.file_utils import get_most_recent_file_in_dir
 from neon_utils.message_utils import request_from_mobile
 
 from mycroft.skills.core import intent_file_handler
-# from mycroft.util import play_wav
-# from mycroft.device import device as d_hw
 from mycroft.util.parse import extract_number
-# from mycroft.util.log import LOG
 from mycroft.util import play_wav
 from subprocess import DEVNULL, STDOUT
+from ovos_utils import classproperty
+from ovos_utils.log import LOG
+from ovos_utils.process_utils import RuntimeRequirements
 from ovos_utils.gui import is_gui_installed
-from neon_utils.skills.neon_skill import NeonSkill, LOG
+from neon_utils.skills.neon_skill import NeonSkill
 from neon_utils.message_utils import get_message_user
 
 
@@ -79,6 +79,18 @@ class UsbCamSkill(NeonSkill):
             LOG.error(e)
 
         self.vidid = 0
+
+    @classproperty
+    def runtime_requirements(self):
+        return RuntimeRequirements(network_before_load=False,
+                                   internet_before_load=False,
+                                   gui_before_load=False,
+                                   requires_internet=False,
+                                   requires_network=False,
+                                   requires_gui=False,
+                                   no_internet_fallback=True,
+                                   no_network_fallback=True,
+                                   no_gui_fallback=True)
 
     def initialize(self):
         # Uses `duration` from mycroft-timer skill
