@@ -7,6 +7,8 @@ Take pictures and videos.
 ## Description  
   
 The skill allows you to capture pictures and videos and saves them to your local device.
+
+Note: Images and videos can be found in ~/Pictures/Neon and ~/Videos/Neon respectively. Videos aren't currently saved on MyCroft Mark II hardware.
   
 ## Examples  
 
