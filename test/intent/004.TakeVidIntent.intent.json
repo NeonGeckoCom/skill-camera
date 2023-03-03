@@ -1,7 +1,0 @@
-{
-  "utterance": "take a 3 second video",
-  "intent_type": "TakeVidIntent.intent",
-  "expected_data": {
-    "duration": "a 3 second"
-  }
-}
