@@ -48,10 +48,9 @@ from neon_utils.skills.neon_skill import NeonSkill
 from neon_utils.message_utils import get_message_user
 
 
-class UsbCamSkill(NeonSkill):
-
-    def __init__(self):
-        super(UsbCamSkill, self).__init__(name="Camera")
+class CameraSkill(NeonSkill):
+    def __init__(self, **kwargs):
+        NeonSkill.__init__(self, **kwargs)
         self.pic_path = os.path.expanduser("~/Pictures/Neon")
         self.vid_path = os.path.expanduser("~/Videos/Neon")
         os.makedirs(self.pic_path, exist_ok=True)
@@ -92,6 +91,7 @@ class UsbCamSkill(NeonSkill):
                                    no_network_fallback=True,
                                    no_gui_fallback=True)
 
+    # TODO: Move to __init__ after stable ovos-workshop
     def initialize(self):
         # Uses `duration` from mycroft-timer skill
         self.register_entity_file('duration.entity')
@@ -358,7 +358,3 @@ class UsbCamSkill(NeonSkill):
 
     def stop(self):
         self.handle_camera_completed()
-
-
-def create_skill():
-    return UsbCamSkill()
