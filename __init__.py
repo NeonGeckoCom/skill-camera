@@ -139,7 +139,7 @@ class CameraSkill(NeonSkill):
             LOG.info("In picture")
             LOG.debug(message.data)
             today = datetime.datetime.today()
-            user = get_message_user(message)
+            user = get_message_user(message) or os.environ.get('USER', os.environ.get('USERNAME'))
             pic_path = os.path.join(self.pic_path, user)
             if not os.path.exists(pic_path):
                 LOG.debug(f"Creating pictures path: {pic_path}")
