@@ -1,29 +1,12 @@
 # Changelog
 
-## [0.2.1a4](https://github.com/NeonGeckoCom/skill-camera/tree/0.2.1a4) (2023-06-28)
+## [1.0.1a1](https://github.com/NeonGeckoCom/skill-camera/tree/1.0.1a1) (2024-02-06)
 
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/0.2.1a3...0.2.1a4)
-
-**Merged pull requests:**
-
-- added out when no username in message [\#44](https://github.com/NeonGeckoCom/skill-camera/pull/44) ([builderjer](https://github.com/builderjer))
-
-## [0.2.1a3](https://github.com/NeonGeckoCom/skill-camera/tree/0.2.1a3) (2023-06-16)
-
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/0.2.1a2...0.2.1a3)
+[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/1.0.0...1.0.1a1)
 
 **Merged pull requests:**
 
-- Fix plugin entrypoint [\#43](https://github.com/NeonGeckoCom/skill-camera/pull/43) ([NeonDaniel](https://github.com/NeonDaniel))
-
-## [0.2.1a2](https://github.com/NeonGeckoCom/skill-camera/tree/0.2.1a2) (2023-06-15)
-
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/0.2.0...0.2.1a2)
-
-**Merged pull requests:**
-
-- Update GH automation to best practices [\#42](https://github.com/NeonGeckoCom/skill-camera/pull/42) ([NeonDaniel](https://github.com/NeonDaniel))
-- Deprecate create\_skill method and Update \_\_init\_\_ for best practices [\#40](https://github.com/NeonGeckoCom/skill-camera/pull/40) ([NeonDaniel](https://github.com/NeonDaniel))
+- Support ovos-utils 0.1 [\#49](https://github.com/NeonGeckoCom/skill-camera/pull/49) ([NeonDaniel](https://github.com/NeonDaniel))
 
 
 
