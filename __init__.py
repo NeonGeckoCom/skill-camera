@@ -105,7 +105,7 @@ class CameraSkill(NeonSkill):
 
     def handle_camera_completed(self, _=None):
         """Close the Camera GUI when finished."""
-        self.gui.remove_page("Camera.qml")
+        self.gui.remove_page("Camera")
         self.gui.release()
 
     def handle_camera_status(self, message):
@@ -131,7 +131,7 @@ class CameraSkill(NeonSkill):
             self.gui["singleshot_mode"] = True
         if activity == "generic":
             self.gui["singleshot_mode"] = False
-        self.gui.show_page("Camera.qml", override_idle=60)
+        self.gui.show_page("Camera", override_idle=60)
 
     @intent_handler('TakePicIntent.intent')
     def handle_take_pic_intent(self, message):
