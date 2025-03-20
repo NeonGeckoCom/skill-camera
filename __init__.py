@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -36,9 +36,9 @@ import subprocess
 from neon_utils.file_utils import get_most_recent_file_in_dir
 from neon_utils.message_utils import request_from_mobile
 
-from mycroft.skills.core import intent_file_handler
-from mycroft.util.parse import extract_number
-from mycroft.util import play_wav
+from ovos_workshop.decorators import intent_handler
+from lingua_franca.parse import extract_number
+from ovos_utils.sound import play_audio
 from subprocess import DEVNULL, STDOUT
 from ovos_utils import classproperty
 from ovos_utils.log import LOG
@@ -105,7 +105,7 @@ class CameraSkill(NeonSkill):
 
     def handle_camera_completed(self, _=None):
         """Close the Camera GUI when finished."""
-        self.gui.remove_page("Camera.qml")
+        self.gui.remove_page("Camera")
         self.gui.release()
 
     def handle_camera_status(self, message):
@@ -131,9 +131,9 @@ class CameraSkill(NeonSkill):
             self.gui["singleshot_mode"] = True
         if activity == "generic":
             self.gui["singleshot_mode"] = False
-        self.gui.show_page("Camera.qml", override_idle=60)
+        self.gui.show_page("Camera", override_idle=60)
 
-    @intent_file_handler('TakePicIntent.intent')
+    @intent_handler('TakePicIntent.intent')
     def handle_take_pic_intent(self, message):
         if ("picture" or "pic" or "photo") in message.data.get("utterance"):
             LOG.info("In picture")
@@ -164,7 +164,7 @@ class CameraSkill(NeonSkill):
                     self.bus.emit(message.forward("neon.metric", {"name": "audio-response"}))
                 else:
                     if self.cam_dev is not None:
-                        play_wav(self.shutter_sound)
+                        play_audio(self.shutter_sound)
                         self.bus.emit(message.forward("neon.metric", {"name": "audio-response"}))
                         # LOG.debug(f"TIME: to_speak, {time.time()}, {message.data['utterance']}, {message.context}")
                         os.system(f"fswebcam -d {self.cam_dev} --delay 2 --skip 2 "
@@ -179,7 +179,7 @@ class CameraSkill(NeonSkill):
             #     if ("user" or "my") in message.data.get("utterance"):
             #         self.save_user_info(newest_pic, "picture")
 
-    @intent_file_handler('ShowLastIntent.intent')
+    @intent_handler('ShowLastIntent.intent')
     def handle_show_last_intent(self, message):
         if "picture" in message.data.get("utterance"):
             if request_from_mobile(message):
@@ -240,7 +240,7 @@ class CameraSkill(NeonSkill):
     def display_image(self, image, secs=15, notify=True):
         # notification sound
         if notify:
-            play_wav(self.notify_sound)
+            play_audio(self.notify_sound)
 
         # method of displaying image
         # if self.configuration_available["devVars"]["devType"] in ("pi", "neonPi"):
@@ -250,7 +250,7 @@ class CameraSkill(NeonSkill):
         else:
             os.system("timeout " + str(secs) + " eog " + image)
 
-    @intent_file_handler('TakeVidIntent.intent')
+    @intent_handler('TakeVidIntent.intent')
     def handle_take_vid_intent(self, message):
         if "video" in message.data.get("utterance"):
             try:
@@ -297,7 +297,7 @@ class CameraSkill(NeonSkill):
                     else:
                         self.speak_dialog("DefaultDuration", {"duration": duration}, private=True)
                     self.vidid += 1
-                    play_wav(self.record_sound)
+                    play_audio(self.record_sound)
                     vid_path = os.path.join(self.vid_path, get_message_user(message))
                     if not os.path.exists(vid_path):
                         LOG.debug(f"Creating video path: {vid_path}")
@@ -307,7 +307,7 @@ class CameraSkill(NeonSkill):
                         ("user" or "my") in message.data.get("utterance") else \
                         vid_path + "user_video_v" + str(self.vidid) + ".avi"
                     os.system(f"streamer -f rgb24 -i {self.cam_dev} -t 00:00:{secs} -o {path}.avi")
-                    play_wav(self.notify_sound)
+                    play_audio(self.notify_sound)
                     # if ("user" or "my") in message.data.get("utterance"):
                     #     self.save_user_info(path, 'video')
 
