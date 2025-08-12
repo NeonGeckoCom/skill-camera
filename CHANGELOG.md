@@ -1,40 +1,12 @@
 # Changelog
 
-## [1.0.2a4](https://github.com/NeonGeckoCom/skill-camera/tree/1.0.2a4) (2025-03-20)
+## [1.1.1a1](https://github.com/NeonGeckoCom/skill-camera/tree/1.1.1a1) (2025-07-31)
 
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/1.0.2a3...1.0.2a4)
-
-**Merged pull requests:**
-
-- Remove gui-specific file extensions to resolve warnings [\#55](https://github.com/NeonGeckoCom/skill-camera/pull/55) ([NeonDaniel](https://github.com/NeonDaniel))
-
-## [1.0.2a3](https://github.com/NeonGeckoCom/skill-camera/tree/1.0.2a3) (2025-03-11)
-
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/1.0.2a2...1.0.2a3)
+[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/1.1.0...1.1.1a1)
 
 **Merged pull requests:**
 
-- Update automation, gitignore, and license notices [\#54](https://github.com/NeonGeckoCom/skill-camera/pull/54) ([NeonDaniel](https://github.com/NeonDaniel))
-
-## [1.0.2a2](https://github.com/NeonGeckoCom/skill-camera/tree/1.0.2a2) (2024-09-17)
-
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/1.0.2a1...1.0.2a2)
-
-**Merged pull requests:**
-
-- Update dependencies to allow for latest OVOS packages [\#53](https://github.com/NeonGeckoCom/skill-camera/pull/53) ([NeonDaniel](https://github.com/NeonDaniel))
-
-## [1.0.2a1](https://github.com/NeonGeckoCom/skill-camera/tree/1.0.2a1) (2024-05-10)
-
-[Full Changelog](https://github.com/NeonGeckoCom/skill-camera/compare/1.0.1...1.0.2a1)
-
-**Implemented enhancements:**
-
-- "take a selfie" intent [\#30](https://github.com/NeonGeckoCom/skill-camera/issues/30)
-
-**Merged pull requests:**
-
-- Remove `mycroft` imports [\#52](https://github.com/NeonGeckoCom/skill-camera/pull/52) ([NeonDaniel](https://github.com/NeonDaniel))
+- ukrainian translation [\#57](https://github.com/NeonGeckoCom/skill-camera/pull/57) ([NeonDmitry](https://github.com/NeonDmitry))
 
 
 
